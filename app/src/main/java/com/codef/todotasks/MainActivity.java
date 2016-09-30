@@ -4,105 +4,101 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.io.FileUtils;
+import com.codef.todotasks.db.TodoTasksAppDB;
+import com.codef.todotasks.entity.Task;
+import com.codef.todotasks.entity.Task_Table;
+import com.codef.todotasks.util.TaskAdapter;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
-import java.io.File;
-import java.io.IOException;
+
 import java.util.ArrayList;
+
+import static com.codef.todotasks.util.Constants.*;
 
 public class MainActivity extends AppCompatActivity {
 
-    ListView lvItems;
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
-    private static final String FILE_NAME = "fcm_todo.txt";
-    private final int REQUEST_CODE = 20;
+    private ListView lvItems;
+    private ArrayList<Task> tasks;
+
+    private TaskAdapter taskAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getApplicationContext().deleteDatabase(TodoTasksAppDB.NAME);
+
         lvItems = (ListView)findViewById(R.id.lvItems);
+
         readItems();
-        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
-        lvItems.setAdapter(itemsAdapter);
-        setupListViewListener();
-
-        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(MainActivity.this, EditItemActivity.class);
-                intent.putExtra("text", ((TextView)view).getText().toString());
-                intent.putExtra("position", position);
-                startActivityForResult(intent, REQUEST_CODE);
-            }
-        });
-
+        taskAdapter = new TaskAdapter(this, this, R.layout.item_task,  tasks);
+        lvItems.setAdapter(taskAdapter);
 
     }
 
-    private void setupListViewListener(){
-        lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                items.remove(position);
-                itemsAdapter.notifyDataSetChanged();
-                writeItems();
-                return true;
-            }
-        });
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // REQUEST_CODE is defined above
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-            // Extract name value from result extras
-            String itemText = data.getExtras().getString("text");
-            int position = data.getExtras().getInt("position");
-            items.set(position,itemText);
-            writeItems();
-            itemsAdapter.notifyDataSetChanged();
-            Toast.makeText(this, itemText, Toast.LENGTH_SHORT).show();
+            Task task = (Task)data.getSerializableExtra(TASK);
+            task.save();
+            readItems();
+            updateTaskList();
+            Toast.makeText(this, task.getDescription(), Toast.LENGTH_SHORT).show();
 
+        }else if (resultCode == ERASE_CODE && requestCode == REQUEST_CODE){
+            Task task = (Task)data.getSerializableExtra(TASK);
+            task.delete();
+            Toast.makeText(this,  DELETED_TXT+ task.getDescription(), Toast.LENGTH_SHORT).show();
+            readItems();
+            updateTaskList();
         }
+
     }
 
     public void onAddItem(View v){
         EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
         String item = etNewItem.getText().toString();
-        items.add(item);
-        etNewItem.setText("");
-        writeItems();
-
+        Task task = new Task();
+        task.setDescription(item);
+        task.save();
+        etNewItem.setText(EMPTY_TXT);
+        readItems();
+        updateTaskList();
 
     }
 
-    private void readItems(){
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, FILE_NAME);
-        try {
-            items = new ArrayList<String>(FileUtils.readLines(todoFile));
-        }catch (IOException e){
-            items = new ArrayList<String>();
+    private void updateTaskList(){
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            taskAdapter.updateList(tasks);
+            taskAdapter.notifyDataSetChanged();
+            }
+        });
+
+    }
+
+    public void readItems(){
+
+        // Set query conditions based on column
+
+         tasks = (ArrayList<Task>) SQLite.select().
+                from(Task.class).orderBy(Task_Table.id,true).
+                queryList();
+        if(taskAdapter != null) {
+            taskAdapter.updateList(tasks);
         }
+
     }
 
-    private void writeItems(){
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, FILE_NAME);
-        try {
-            FileUtils.writeLines(todoFile, items);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-    }
+
 }

@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="horizontal"
+              >
+
+
+    <CheckBox
+        android:layout_height="wrap_content"
+        android:id="@+id/cb_completed"
+        android:layout_width="wrap_content"
+        android:shadowColor="@color/colorPrimaryDark"
+        style="@style/Base.Widget.AppCompat.CompoundButton.CheckBox"
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_weight="5"
+        android:paddingLeft="10dp">
+
+        <TextView
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_task"
+            android:layout_weight="2"
+            android:textSize="17dp"
+            android:layout_width="match_parent"/>
+        <TextView
+            android:textColor="@color/colorPrimary"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_date"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:textSize="10dp">
+
+
+        </TextView>
+    </LinearLayout>
+
+
+</LinearLayout>

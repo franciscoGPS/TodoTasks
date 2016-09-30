@@ -12,22 +12,55 @@
     tools:context="com.codef.todotasks.EditItemActivity">
 
     <EditText
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
+        android:id="@+id/etEditItem"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cb_completed"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_below="@+id/etEditItem"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/etEditItem"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
+        android:layout_marginTop="19dp"/>
+
+    <TextView
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/cb_completed"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/tv_completed_at"/>
 
     <Button
         android:text="Save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/etEditItem"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/saveItem"/>
+        android:id="@+id/saveItem"
+        android:layout_marginTop="38dp"
+        android:layout_below="@+id/cb_completed"
+        android:layout_toRightOf="@+id/cb_completed"
+        android:layout_toEndOf="@+id/cb_completed"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:text="Delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/deleteItem"
+        android:layout_alignBaseline="@+id/saveItem"
+        android:layout_alignBottom="@+id/saveItem"
+        android:layout_toRightOf="@+id/saveItem"
+        android:layout_toEndOf="@+id/saveItem"
+        android:layout_marginLeft="26dp"
+        android:layout_marginStart="26dp"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>
