@@ -12,19 +12,24 @@ import android.widget.TextView;
 
 import com.codef.todotasks.entity.Task;
 import com.codef.todotasks.entity.Task_Table;
+import com.codef.todotasks.util.DateUtil;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.Date;
 
+
+import static com.codef.todotasks.util.Constants.*;
+
 public class EditItemActivity extends AppCompatActivity {
 
-    EditText etEditItem;
-    Button btnSave, btnDelete;
+    private EditText etEditItem;
+    private Button btnSave, btnDelete;
     private int position;
     private Task task;
-    private final int ERASE_CODE = 30;
-    CheckBox checkBox;
-    TextView tvCompletedAt;
+
+
+    private CheckBox checkBox;
+    private TextView tvCompletedAt;
 
 
 
@@ -41,10 +46,10 @@ public class EditItemActivity extends AppCompatActivity {
         getValues();
 
 
-        etEditItem.setText(task.getDescription() != null ? task.getDescription() : "");
+        etEditItem.setText(task.getDescription() != null ? task.getDescription() : EMPTY_TXT);
         if(task.getCompletedAt() != null){
             checkBox.setChecked(true);
-            tvCompletedAt.setText("Completed on: \n"+ task.getCompletedAt().toString());
+            tvCompletedAt.setText(COMPLETED_LABEL+ DateUtil.format(task.getCompletedAt()));
         }
 
 
@@ -59,10 +64,10 @@ public class EditItemActivity extends AppCompatActivity {
                 if(v instanceof CheckBox)
                     if(((CheckBox)v).isChecked()){
                         task.setCompletedAt(new Date());
-                        tvCompletedAt.setText("Completed on: \n"+ task.getCompletedAt().toString());
+                        tvCompletedAt.setText(COMPLETED_LABEL+ DateUtil.format(task.getCompletedAt()));
                     }else {
                         task.setCompletedAt(null);
-                        tvCompletedAt.setText("");
+                        tvCompletedAt.setText(EMPTY_TXT);
                     }
                 task.save();
             }
@@ -74,15 +79,9 @@ public class EditItemActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent data = new Intent(getApplicationContext(), MainActivity.class);
                 // Pass relevant data back as a result
-
-
                 task.setDescription(etEditItem.getText().toString());
-
-
-
-                data.putExtra("task", task);
+                data.putExtra(TASK, task);
                 data.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                //startActivity(data);
                 setResult(RESULT_OK, data); // set result code and bundle data for response
                 finish(); // closes the activity, pass data to parent
             }
@@ -93,17 +92,9 @@ public class EditItemActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent data = new Intent(getApplicationContext(), MainActivity.class);
                 // Pass relevant data back as a result
-
-
                 task.setDescription(etEditItem.getText().toString());
-
-
-
-                data.putExtra("task", task);
-
+                data.putExtra(TASK, task);
                 data.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                //startActivity(data);
-
                 setResult(ERASE_CODE, data); // set result code and bundle data for response
                 finish(); // closes the activity, pass data to parent
             }
@@ -113,7 +104,7 @@ public class EditItemActivity extends AppCompatActivity {
     }
 
     private void getValues(){
-        int taskId =  getIntent().getIntExtra("task_id", 0);
+        int taskId =  getIntent().getIntExtra(TASK_ID, DEFAULT_INVALID_VALUE );
         getTask(taskId);
     }
 

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.raizlabs.android.dbflow.config.FlowManager.getContext;
+import static com.codef.todotasks.util.Constants.*;
 
 
 /**
@@ -33,22 +33,20 @@ public class TaskAdapter extends BaseAdapter {
     private ArrayList<Task> tasks;
     private MainActivity mainActivity;
 
-    private final int REQUEST_CODE = 20;
-    private final int ERASE_CODE = 30;
-
-
+    private LayoutInflater inflater;
 
     public TaskAdapter(MainActivity activity, Context context, int resource, List<Task> objects) {
 
         this.context = context;
         this.tasks = (ArrayList<Task>) objects;
         mainActivity = activity;
+        inflater = LayoutInflater.from(context);
+
     }
 
     @Override
     public Task getItem(int position) {
         return tasks.get(position);
-
     }
 
     @Override
@@ -58,70 +56,64 @@ public class TaskAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        final TaskViewHolder taskViewHolder;
 
-        // Get the data item for this position
         Task task = getItem(position);
-        // Check if an existing view is being reused, otherwise inflate the view
+
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_task, parent, false);
-
-        // Lookup view for data population
-        TextView tvDescription = (TextView) convertView.findViewById(R.id.tv_task);
-        CheckBox cbCompleted = (CheckBox) convertView.findViewById(R.id.cb_completed);
-        // Populate the data into the template view using the data object
-
-        tvDescription.setText(task.getDescription() != null ? task.getDescription() : "");
-
-        if (task.getCompletedAt() != null ) {
-            cbCompleted.setChecked(true);
-        }else {
-            cbCompleted.setChecked(false);
+            convertView = inflater.inflate(R.layout.item_task, parent, false);
+            taskViewHolder = new TaskViewHolder(convertView);
+            convertView.setTag(taskViewHolder);
+        } else {
+            taskViewHolder = (TaskViewHolder) convertView.getTag();
         }
 
-        convertView.setId(task.getId());
-        tvDescription.setId(task.getId());
-        cbCompleted.setId(task.getId());
+        taskViewHolder.tvDesc.setText(task.getDescription() != null ? task.getDescription() : "");
 
-        tvDescription.setOnClickListener(new View.OnClickListener() {
+        if (task.getCompletedAt() != null ) {
+            taskViewHolder.cbCompleted.setChecked(true);
+        }else {
+            taskViewHolder.cbCompleted.setChecked(false);
+        }
+
+
+        taskViewHolder.setId(task.getId());
+        taskViewHolder.cbCompleted.setId(task.getId());
+        taskViewHolder.tvCompletedAt.setText(task.getCompletedAt() != null ?  COMPLETED_SIGN+ DateUtil.format(task.getCompletedAt()) : EMPTY_TXT);
+        taskViewHolder.tvDesc.setId(task.getId());
+
+        taskViewHolder.tvDesc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int taskId = v.getId();
                 Intent intent = new Intent(context, EditItemActivity.class);
-                intent.putExtra ("task_id", taskId);
+                intent.putExtra (TASK_ID, taskId);
                 ((MainActivity)context).startActivityForResult(intent,REQUEST_CODE);
             }
         });
 
-            convertView.setOnLongClickListener(onLongClickListener);
 
-            tvDescription.setOnLongClickListener(onLongClickListener);
-
-
-
-
-
-        cbCompleted.setOnClickListener(new View.OnClickListener() {
+        taskViewHolder.cbCompleted.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (v instanceof CheckBox){
+
                     Task task = getTask(v.getId());
                     if(((CheckBox)v).isChecked()) {
                         task.setCompletedAt(new Date());
+                        taskViewHolder.tvCompletedAt.setText(COMPLETED_SIGN + DateUtil.format(task.getCompletedAt()));
                         task.save();
+
                     }else {
                         task.setCompletedAt(null);
                         task.save();
+                        taskViewHolder.tvCompletedAt.setText(EMPTY_TXT);
                     }
-
-
-                }
-
-
             }
 
         });
+
+
         // Return the cbCompleted view to render on screen
-        }
         return convertView;
     }
 
@@ -133,33 +125,37 @@ public class TaskAdapter extends BaseAdapter {
     public void updateList(ArrayList<Task> tasks){
         this.tasks = tasks;
         notifyDataSetChanged();
-    }
-
-
-    private View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View v) {
-            int taskId = v.getId();
-
-            Task task = getTask(taskId);
-            if(task != null) {
-                task.delete();
-            }else{
-                int id = task.getId();
-            }
-
-            //mainActivity.onDeleteItem(task);
-            mainActivity.readItems();
-            notifyDataSetChanged();
-
-            return true;
-
-        }
-
-
     };
+
 
      public Task getTask(int taskId){
         return SQLite.select().from(Task.class).where(Task_Table.id.eq(taskId)).querySingle();
+    }
+
+
+    /**
+     * ViewHolder Pattern implementation
+     */
+    private class TaskViewHolder  {
+        TextView tvDesc, tvCompletedAt;
+        CheckBox cbCompleted;
+        private int id;
+
+
+        public TaskViewHolder(View item) {
+            tvDesc = (TextView) item.findViewById(R.id.tv_task);
+            tvCompletedAt = (TextView) item.findViewById(R.id.tv_date);
+            cbCompleted = (CheckBox) item.findViewById(R.id.cb_completed);
+        }
+
+        public void setId (int id){
+            this.id = id;
+        }
+
+        public int getId (){
+            return this.id;
+        }
+
+
     }
 }
