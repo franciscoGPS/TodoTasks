@@ -5,7 +5,7 @@
     <application
         android:allowBackup="true"
         android:name=".TodoTasksApp"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/todo_ico"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">

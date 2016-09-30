@@ -7,10 +7,13 @@
     <CheckBox
         android:layout_height="wrap_content"
         android:id="@+id/cb_completed"
-        android:layout_width="wrap_content"/>
+        android:layout_width="wrap_content"
+        android:shadowColor="@color/colorPrimaryDark"
+        style="@style/Base.Widget.AppCompat.CompoundButton.CheckBox"/>
 
     <TextView
         android:text="TextView"
+        android:textColor="@color/colorPrimaryDark"
         android:layout_height="wrap_content"
         android:id="@+id/tv_task"
         android:layout_weight="1"

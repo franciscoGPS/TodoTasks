@@ -45,17 +45,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/saveItem"
-        android:layout_marginTop="34dp"
+        android:layout_marginTop="38dp"
         android:layout_below="@+id/cb_completed"
         android:layout_toRightOf="@+id/cb_completed"
-        android:layout_toEndOf="@+id/cb_completed"/>
+        android:layout_toEndOf="@+id/cb_completed"
+        android:layout_centerHorizontal="true"/>
 
     <Button
         android:text="Delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/deleteItem"
+        android:layout_alignBaseline="@+id/saveItem"
         android:layout_alignBottom="@+id/saveItem"
-        android:layout_toRightOf="@+id/tv_completed_at"
-        android:layout_toEndOf="@+id/tv_completed_at"
-        android:id="@+id/deleteItem"/>
+        android:layout_toRightOf="@+id/saveItem"
+        android:layout_toEndOf="@+id/saveItem"
+        android:layout_marginLeft="26dp"
+        android:layout_marginStart="26dp"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>
